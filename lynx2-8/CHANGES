@@ -1,0 +1,184 @@
+Changes since Lynx 2.8 release
+================================================================================
+
+1998-05-23 (2.8.1dev.13)
+* use new function LYLocalFileToUrl to cleanup some pathname references - TD
+* eliminate 'tempname()' function, using LYNewTxtFile, etc., with new functions
+  LYOpenTemp, LYCloseTemp, etc., so that temporary files are opened with
+  appropriate permissions - TD
+* correct use of cache variable in CF_ALT_CHAR_SET (reported by BL) - TD
+* spell out the logic in HTPlain.c against 2.7.2:  there was a certain problem
+  with chartrans in text/plain mode (LYRawMode was wrongly interferring,
+  problem reported by Jacob Poon & FM).  - LP
+* modify logic for zero-width spaces in conv_uni_to_pc to exclude 0x200a - LP
+* supply missing "break", which was forcing raw utf-8 output in URLs (NOT hex
+  escaped) - LP
+1998-05-14 (2.8.1dev.12)
+* remove unneeded definition used in testing dev.11 from config.hin) - TD
+1998-05-14 (2.8.1dev.11)
+* fixes for function-keys with slang configuration on DOS (patch by DK).
+* correct missing '&' in command-line options entry for syslog (reported by
+  HN) - TD
+* correct initial value for NoColorvideo with PDCurses, from my error in
+  1998-05-10 integration (reported by DK) - TD
+1998-05-10 (2.8.1dev.10)
+* eliminate assignment to stderr for trace-file by making tfp a function. - TD
+* added John Davis' keymaps/keysym patch (it really should be integrated with
+  the normal lynx.cfg file).
+* tweak chartrans, "Convert the octet to Unicode":  incoming symbols >127 but <
+  LYlowest_eightbit[IN-charset] now ignored, previously displayed as UFFFD.
+  (SGML.c, HTPlain.c, LYCharUtils.c) - LP
+* removed conflicting/unused declaration of 'bzero()' from tcp.h (from report
+  by Ashraf Zorkani <zorkani@aucegypt.edu>) - TD
+* modify the set/unset/toggle options to allow "on" and "off" values also - TD
+* apply the "partial display" patch, modified from:  
+      http://www.flora.org/lynx-dev/html/month0398/msg00993.html  
+  The behavior is controlled by a compile-time option (DISP_PARTIAL), by a
+  command-line argument (-partial), and by a lynx.cfg option (PARTIAL).  - BL
+* extend command-line option processing of set/unset/toggle options 
+      -toggle-     (set that toggle to FALSE) 
+      -toggle+     (set that toggle to TRUE) 
+  e.g.,
+      lynx -show_cursor+ -case- 
+  or with explicit 1/0 values, e.g.,
+      -toggle=0     (set that toggle to FALSE) 
+      -toggle=1     (set that toggle to TRUE)  
+  NOTE:  this allows you to change a few flags that would previously have been
+  controlled by lynx.cfg, and are security-related, such as -locexec or
+  -telnet.  I believe there is no issue, because if the user can control the
+  command line to Lynx, he could have run `lynx -cfg my_cfg_file` and
+  circumvented those settings anyway.  - BL
+* fix for buffer-overrun in LYMail.c when processing a mailto:very-log-address
+  URL - BL
+* correct, for OS/2 EMX, a place in LYConvertToURL() which must not use
+  HTDOS_wwwName() (patch by Jason F. McBrayer <jmcbray@mailhost.tcs.tulane.edu>)
+* similar changes to LYCurses.c, LYMain.c, LYStrings.c, add src/makefile.wsl, for building
+  DOS version with slang - Bill Schiavo
+* modify LYCurses.c, LYMain.c, LYStrings.c, add src/makefile.dsl, for building
+  DOS version with slang - DK
+* fix to improve reloading if user changed assume_charset in options menu
+  using ^A, which sometimes did not work - LP
+* add several chartrans-related files to test/ directory:  spaces.html,
+  c1.html, raw8bit.html - LP
+* fixes to compile on SunOS with K&R compiler. - TD
+1998-05-03 (2.8.1dev.9)
+* correct missing counter increment in tempname(), from cleanup. - TD
+1998-05-02 (2.8.1dev.8)
+* Fix for CGI-related URLs processing (syntax:  ?x=1&yz=2).  To avoid interfere
+  with SGML we restrict '=' as terminator for a named entity, this only applied
+  for HREF= attribute translation (LYCharUtils.c).  (reported by Alex Matulich
+  alex@unicorn.us.com & FM).  - LP
+* restore information in the INSTALLATION file for the DOS port on patching
+  tcplib.  Also, clarifies the location of nullpkt.  It also clarifies
+  that the PDCurses beta has incorporated some of the patches we made for
+  the lynx DOS port. - DK
+* modify logic that updates bookmark file after removing a link to use copy
+  rather than rename, to solve file-ownership problems (patch by Paul
+  Gilmartin, though I kept the permissions check). - TD
+* reduce a little of the clutter in tempname() with fmt_tempname, and
+  bad_tempname functions.  Though this doesn't address the security problems it
+  does fix the problem with signed getpid values.  - TD
+* simplify LYUtils.c with compare_type() function - TD
+* add/use string functions LYLowerCase, LYUpperCase, LYRemoveBlanks (replaces
+  collapse_spaces), LYTrimLeading, LYTrimTrailing (incidentally fixes core-dump
+  in LYCookie.c) - TD
+* rewrite read_cfg function to make it more table-driven (reworked from a
+  patch by John Davis) - TD
+* rewrite parse_arg function to make it more table-driven (reworked from a
+  patch by John Davis) - TD
+* omit -Olimit compiler option on Digital UNIX 4.0 (patch by Tomas Vanhala).
+* modify configure test for acs_map[] array to work on Digital UNIX 4.0
+  (reported by Jim Spath and Tomas Vanhala <vanhala@ling.helsinki.fi>).  - TD
+1998-04-23 (2.8.1dev.7)
+* fix core-dump when pressing '.' on a page with no links (patch by
+  Jan Hlav\'{a}\v{c}ek <lahvak@math.ohio-state.edu>).
+* initial changes to use macros CTRACE and tfp to replace explicit use of
+  stderr for the trace log.  Remaining work is required for some complex
+  expressions, switching file pointers and for perror-substitute. - TD
+* ifdef's for OS/2 EMX, mostly pathname tweaks (patch by Jason F. McBrayer
+  <jmcbray@mailhost.tcs.tulane.edu>).
+1998-04-18 (2.8.1dev.6)
+* correct misplaced ifdef in LYMail.c, which caused Cc to not work (patch
+  by LE).
+* convert \x escapes to octal form (reported by Claude Soma). - TD
+* modify configure script to check for cursesX before curses library, for
+  ultrix 4.3 (reported by Claude Soma <soma_c@decus.fr>). - TD
+* incorporate lpansi into LYPrint.c (patch by HN).
+* modify top-level makefile to use INSTALL_PROGRAM and INSTALL_DATA
+  consistently, rather than installbin and installdoc (reported by
+  <karl@deas.harvard.edu>).  - TD
+* modify treatment of -auth and -pauth options to allow setting a blank
+  password, e.g., -pauth=user:  specifies a blank password, and -pauth=user
+  leaves the password unspecified (patch by Frederick P Herrmann
+  <fph@tiac.net>).
+* Change documentation to indicate "Lynx.trace" file rather than "lynx.trace".
+* Change default for USE_TRACE_LOG in userdefs.h to TRUE, to make behavior
+  consistent with 2.7.2 - TD
+* Rename no_color_video symbol in LYCurses.c to NoColorVideo, to avoid conflict
+  with term.h, which is included by curses.h on some systems (reported by Paul
+  Gilmartin). - TD
+* modify include-path in djgpp makefile to avoid conflicting tcp.h - DK
+* Add -tagsoup option, for initializing parser directly to TagSoup. - TD
+* Modify HTML.c, ifdef'ing some of the logic involved in unstacking tags.  It
+  appears to be not completely necessary:  makes Lynx a little faster, at the
+  cost of making the tagsoup parser do the wrong thing.  Some entries in the
+  tagsoup DTD table versus the sortasgml table have SGML_EMPTY versus
+  SGML_MIXED.  This information is used to control unstacking (in the
+  color-style configuration as well).  There is still a problem evidenced
+  when toggling between the two parsers in the Lynx main help page, but that
+  appears to be missing logic in 2.8's version of the tagsoup parser.  - TD
+* Modify HTTCP.c to check the length returned from gethostbyname(), which
+  returns 0 on error on a SunOS 4 system (reported by Paul Gilmartin). - TD
+1998-03-29 (2.8.1dev.5)
+* Fixed my typo for FNAMES_8_3 define. WB
+* Added SYSTEM_MAIL and SYSTEM_MAIL_FLAGS defines for DOSPATH target. WB
+* Better kluge to set terminal type for DOSPATH. WB
+* Restored DOSPATH kludge to get to root of directory. WB
+* Added a bit of missing _WINDOWS_NSL ifdef'ing. WB
+* Minor DOS dirent mod to work with Tom's rearrangements. WB
+* Changed #if XYZ to #ifdef XYZ in tcp.h for dumb (?) compilers. WB
+1998-03-25 (2.8.1dev.4)
+* restore original string in LYUtils.c when user enters a badly formed or
+  nonexistent URL when prompted for Goto/history list (patch by Randall
+  <hezekiah@may98.rahul.net>).  Otherwise Lynx would always attempt to load a
+  local file if the original string omits scheme:// prefix but guessing fails.
+* tweak formatting of .message in HTFTP.c so it has leading/trailing blank
+  lines (patch by Ismael Cordeiro <ismael@CAM.ORG>)
+* retested 'make depend' rule (for Larry Virden) - TD
+* eliminate (except for absolute pathnames, as in VMS) quoted includes - TD
+* remove WWW/Library/Implementation/HTAlert.[ch], since they conflict with
+  src/HTAlert.[ch], and are not used - TD
+* replace the [LINK], [INLINE] and [IMAGE] comments (for images without ALT)
+  with filenames of these images.  This feature can be enabled or disabled by
+  setting VERBOSE_IMAGES in lynx.cfg and/or userdefs.h (patches by
+  helen@voland.cc.huji.ac.il and wschiavo@concentric.net>)
+* consistently use ${cf_cv_ncurses_header-curses.h} rather than
+  $cf_cv_ncurses_header in configure script, as noted by JS - TD
+* tweak include of HTML.h in HTFile.h to fix compile problem on VMS (we really
+  should not use quote-style includes) - TD
+* fixes to LYStyle.c to make color-style code work on Digital Unix 4.0 - TD
+1998-03-20 (2.8.1dev.3)
+* Added death for Win/DOS clients that don't have a TMP space defined. - WB
+* Added _WINDOWS_NSL to provide interruptable lookups in Win32 per a
+  patch from afn06760@afn.org. (modified hopefully for borland AND cygwin and
+  hard defined in tcp.h).  I had to recompile everything in multithread
+  mode for borland, including my zlib library. - WB
+* Added _WINDOWS as a target for FNAMES_8_3 in userdefs.h to allow for 16
+  bit helper apps that can't handle LFN's. (report by afn06760@afn.org) - WB
+1998-03-18 (2.8.1dev.1)
+* correct an ifdef that caused inconsistent pathname separators on Windows
+  (reported by afn, patch by DK).
+* correct a missing AC_MSG_RESULT in configure.in (also MM) - TD
+* guard against illegal (e.g., zero) value for DEFAULT_CACHE_SIZE, when it is
+  read from lynx.cfg (reported by Martin Mokrejs
+  <mmokrejs@prfdec.natur.cuni.cz>) - TD
+* implement simple 'include' facility for lynx.cfg - BL
+* change TagClass and TagFlags to #define's to accommodate older compilers
+  which do not accept initialization of enums from data that do not correspond
+  to the declared values, e.g., CLIX (which complains) and Apollo (which fails
+  to compile, reported by Dave Eaton).  - TD
+* remove some obsolete definitions from userdefs.h, tcp.h and HTUtils.h - TD
+* remove obsolete files from WWW/Library - TD
+1998-03-12
+* UPPER8: a separate function HTMLSetDisplayCharsetMatchLocale() introduced
+  (LYCharSets.c). Locale mismatch assumed for DOS/WINDOWS display charsets. - LP
